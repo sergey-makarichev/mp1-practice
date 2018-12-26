@@ -1,109 +1,140 @@
-#include <stdio.h>
+п»ї#include <stdio.h>
+#include <time.h>
+#include <windows.h>
 #include <stdlib.h>
 #include <string.h>
-#define NUM_FILES 4
+#include <locale.h>
+#define T 2048
 
-/*typedef struct FILES {
-char*  name;
-float size;
-}names;
-int size_cmp(const void * a, const void *b) {
-return ((names*)a)->size - ((names*)b)->size;
-}
-void insert(a,n,)
+typedef struct
 {
-int i, tmp, j;
-for (i = 1; i < NUM_FILES; i++)
+	wchar_t name[T];
+	ULONGLONG Size;
+}files;
+
+void choose(int n, files b[])
 {
-tmp = size[i];
-j = i - 1;
-while ((j >= 0) && (a[j] > tmp))
-{
-a[j + 1] = a[j];
-a[j] = tmp;
-j--;
+	int i, min, j, min_idx;
+	for (i = 0; i < n; i++)
+	{
+		min = b[i].Size;
+		min_idx = i;
+		for (j = i + 1; j < n; j++)
+		{
+			if (b[j].Size < min)
+			{
+				min = b[j].Size;
+				min_idx = j;
+			}
+		}
+		b[min_idx].Size = b[i].Size;
+		b[i].Size = min;
+	}
 }
-}
-for (i = 0; i < n; i++)
-printf("%d", a[i]);
-}
-void main()
-{
-names persons[NUM_FILES] = {
-{.name = "musik",.size = 68.9},
-{.name = "games",.size = 182 },
-{.name = "projects",.size = 180 },
-{.name = "home",.size = 73.4 }
-};
-int i;
-printf("\nUnsorted:\n");
-for (i = 0; i < NUM_FILES; ++i)
-printf("%s\t%.1f\t", persons[i].name, persons[i].size);
-insert(persons, NUM_FILES, sizeof(names), size_cmp);
-printf("\nSorted by height:\n");
-for (i = 0; i < NUM_FILES; ++i)
-printf("%s\t%.1f\t", persons[i].name, persons[i].size);
-}
-struct files
-{
-char* a[4];
-int b[4];
-}A;*/
-void insert(int* b[], int n)
+
+
+void insert(int n, files b[])
 {
 	int i, tmp, j;
 	for (i = 1; i < n; i++)
 	{
-		tmp = *b[i];
+		tmp = b[i].Size;
 		j = i - 1;
-		while ((j >= 0) && (*b[j] > tmp))
+		while ((j >= 0) && (b[j].Size > tmp))
 		{
-			*b[j + 1] = *b[j];
-			*b[j] = tmp;
+			b[j + 1].Size = b[j].Size;
+			b[j].Size = tmp;
 			j--;
 		}
 	}
 }
 
-void main()
+void bubble(int n, files b[])
 {
+	int i, j, tmp;
+	for (i = 0; i < n; i++)
+	{
+		for (j = 1; j < n - i; j++)
+		{
+			if (b[j - 1].Size > b[j].Size)
+			{
+				tmp = b[j].Size;
+				b[j].Size = b[j - 1].Size;
+				b[j - 1].Size = tmp;
+			}
+		}
+	}
+}
+
+void count_sort(int n, files b[], int k)
+{
+	int count[] = { 0 }, i, j, idx;
+	for (i = 0; i < n; i++)
+	{
+		count[b[i].Size]++;
+		idx = 0;
+	}
+	for (i = 0; i < k; i++)
+	{
+		for (j = 0; j < count[i]; j++)
+		{
+			b[idx++].Size = i;
+		}
+	}
+}
+void merge(struct files a[], long l, long m, long r)
+{
+	long q1 = m - l + 1;
+	long q2 = r - m;
 	int i, j;
-	char* a[4];
-	int b[4];
-	a[0] = "musik";
-	a[1] = "games";
-	a[2] = "projects";
-	a[3] = "home";
-	for (i = 0; i<4; i++)
-		printf("%s\n", a[i]);
-	b[0] = 12;
-	b[1] = 44;
-	b[2] = 6;
-	b[3] = 94;
-	for (j = 0; j<4; j++)
-		printf("%d\n", b[j]);
-	//insert(&b[0], NUM_FILES);
-	for (i = 0; i<4; i++)
-		printf("%s\n", b[i]);
-
+	int d;
+	struct files* L;
+	struct files* R;
+	for (i = 0; i < q1; i++)
+		L[i] = a[l + i];
+	for (j = 0; j < q2; j++)
+		R[j] = a[m + 1 + j];
+	i = 0;
+	j = 0;
+	d = l;
+	while (i < q1)
+	{
+		a[d] = L[i];
+		i++;
+		d++;
+	}
+	while (j < q2)
+	{
+		a[d] = R[j];
+		j++;
+		d++;
+	}
 }
 
-/*#include <stdio.h>
-#define N 5
-
-void quick_sort(int a[], int n1 , int n2)
+void merge_sort(struct fles a[], long l, long r)
 {
-	int pidx = (n1 + n2) / 2;
-	int i = n1, j = n2;
-	void quick_split(int, int*, int*, int);
-	for (i = 0; i < N; i++)
-		scanf("%d", &(a[i]));
-	quick_split(a, &i, &j, a[pidx]);
-	if (i < n2)
-		quick_sort(a, i, n2);
-	if (j > n1)
-		quick_sort(a, n1, j);
+	long m;
+	if (l < r)
+	{
+		m = l + (r - l) / 2;
+		merge_sort(a, l, m);
+		merge_sort(a, m + 1, r);
+		merge(a, l, m, r);
+	}
 }
+
+void quick_sort(files a[], int l, int r)
+{
+	int pidx = (l + r) / 2;
+	int i = l, j = r;
+	void quick_split(int, int*, int*, int);
+	quick_split(a, &i, &j, a[pidx].Size);
+	if (i < r)
+		quick_sort(a, i, r);
+	if (j > l)
+		quick_sort(a, l, j);
+}
+
 void quick_split(int a[], int *i, int *j, int p)
 {
 	do
@@ -122,203 +153,147 @@ void quick_split(int a[], int *i, int *j, int p)
 		}
 	} while (*i < *j);
 }
-void main()
-{
-	int a[N], b = 0, e = N-1;
-	quick_sort(a, b, e);
-}
 
-#include <stdio.h>
-#define N 4
-
-//выбором
-void choose(int a[], int n)
+void print(files b[], float y, int n)
 {
-int i, min, j, min_idx;
-for (i = 0; i < n; i++)
-scanf("%d", &(a[i]));
-for (i = 0; i < n; i++)
-{
-min = a[i];
-min_idx = i;
-for (j = i + 1; j < n; j++)
-{
-if (a[j] < min)
-{
-min = a[j];
-min_idx = j;
-}
-}
-a[min_idx] = a[i];
-a[i] = min;
-}
-for (i = 0; i < n; i++)
-printf("%d", a[i]);
-}
-void main()
-{
-int a[N];
-choose(a, N);
-}
-
-#include <stdio.h>
-#define N 10
-#define K 4
-
-//подсчётомие. Рассмотренный алгоритм можно использовать только для последовательностей,
-которые не содержат одинаковых элементов! Для сортировки последовательностей,
-содержащих одинаковые элементы, алгоритм необходимо модифицировать.
-
-void count_sort(int a[], int n, int k)
-{
-	int count[K] = { 0 }, i, j, idx;
+	int i;
 	for (i = 0; i < n; i++)
-		scanf("%d", &(a[i]));
-	for (i = 0; i < n; i++)
+		wprintf(L"File: %ls Size: %lld\n", b[i].name, b[i].Size);
+	printf("РІСЂРµРјСЏ СЃРѕСЂС‚РёСЂРѕРІРєРё = %f", y);
+}
+
+int sum_files(const wchar_t *sDir)
+{
+	WIN32_FIND_DATA fdFile;
+	HANDLE hFind = NULL;
+	wchar_t sPath[2048];
+	int i = 0;
+
+	wsprintf(sPath, L"%s\\*.*", sDir);
+	if ((hFind = FindFirstFile(sPath, &fdFile)) == INVALID_HANDLE_VALUE)
 	{
-		count[a[i]]++;
-		idx = 0;
+		return 0;
 	}
-	for (i = 0; i < k; i++)
+
+	do
 	{
-		for (j = 0; j < count[i]; j++)
+		if (wcscmp(fdFile.cFileName, L".") != 0 && wcscmp(fdFile.cFileName, L"..") != 0)
 		{
-			a[idx++] = i;
+			i++;
 		}
-	}
-	for (i = 0; i < n; i++)
-		printf("%d", a[i]);
+	} while (FindNextFile(hFind, &fdFile));
+	FindClose(hFind);
+	return i;
 }
-void main()
+int ListDirectoryContents(const wchar_t *sDir, files a[], int n)
 {
-	int a[N];
-	count_sort(a, N, K);
-}
+	WIN32_FIND_DATA fdFile;
+	HANDLE hFind = NULL;
+	wchar_t sPath[2048];
+	int i = 0;
 
-
-#include <stdio.h>
-#define N 10
-
-//пузырьковая
-void bubble(int a[], int n)
-{
-	int i, j, tmp;
-	for (i = 0; i < n; i++)
-		scanf("%d", &(a[i]));
-	for (i = 0; i < n; i++)
+	wsprintf(sPath, L"%s\\*.*", sDir);
+	if ((hFind = FindFirstFile(sPath, &fdFile)) == INVALID_HANDLE_VALUE)
 	{
-		for (j = 1; j < n - i; j++)
-		{
-			if (a[j - 1] > a[j])
-			{
-				tmp = a[j];
-				a[j] = a[j - 1];
-				a[j - 1] = tmp;
-			}
-		}
+		wprintf(L"Path not found: [%s]\n", sDir);
+		return 1;
 	}
-	for (i = 0; i < n; i++)
-		printf("%d", a[i]);
-}
-void main()
-{
-	int a[N];
-	bubble(a, N);
-}
 
-/*#include <stdio.h>
-#define N 10
-
-void merge_sort(int a[], int l, int r)
-{
-if (l == r)
-return;
-int m = (l + r) / 2;
-merge_sort(a, m + 1, r);
-merge(a, l, m, r);
-}
-void merge(int a[], int l, int m, int r)
-{
-int i
-
-}
-void main()
-{
-
-}
-#include <stdio.h>
-#include <stdlib.h>
-void merge(int *a, int n)
-{
-	int mid = n / 2; // находим середину сортируемой последовательности
-	if (n % 2 == 1)
-		mid++;
-	int h = 1; // шаг
-			   // выделяем память под формируемую последовательность
-	int *c = (int*)malloc(n * sizeof(int));
-	int step;
-	while (h < n)
+	do
 	{
-		step = h;
-		int i = 0;   // индекс первого пути
-		int j = mid; // индекс второго пути
-		int k = 0;   // индекс элемента в результирующей последовательности
-		while (step <= mid)
+		if (wcscmp(fdFile.cFileName, L".") != 0 && wcscmp(fdFile.cFileName, L"..") != 0)
 		{
-			while ((i < step) && (j < n) && (j < (mid + step)))
-			{ // пока не дошли до конца пути
-			  // заполняем следующий элемент формируемой последовательности
-			  // меньшим из двух просматриваемых
-				if (a[i] < a[j])
-				{
-					c[k] = a[i];
-					i++; k++;
-				}
-				else {
-					c[k] = a[j];
-					j++; k++;
-				}
-			}
-			while (i < step)
-			{ // переписываем оставшиеся элементы первого пути (если второй кончился раньше)
-				c[k] = a[i];
-				i++; k++;
-			}
-			while ((j < (mid + step)) && (j<n))
-			{  // переписываем оставшиеся элементы второго пути (если первый кончился раньше)
-				c[k] = a[j];
-				j++; k++;
-			}
-			step = step + h; // переходим к следующему этапу
+			ULONGLONG fileSize = fdFile.nFileSizeHigh;
+			fileSize <<= sizeof(fdFile.nFileSizeHigh) * 8;
+			fileSize |= fdFile.nFileSizeLow;
+			files file;
+			wsprintf(sPath, L"%s\\%s", sDir, fdFile.cFileName);
+			wcsncpy(file.name, sPath, 50);
+			file.Size = fileSize;
+			a[i] = file;
+			i++;
 		}
-		h = h * 2;
-		// Переносим упорядоченную последовательность (промежуточный вариант) в исходный массив
-		for (i = 0; i<n; i++)
-			a[i] = c[i];
-	}
-}
-int main()
-{
-	int a[8];
-	// Заполнение массива случайными числами
-	for (int i = 0; i<8; i++)
-		a[i] = rand() % 20 - 10;
-	// Вывод элементов массива до сортировки
-	for (int i = 0; i<8; i++)
-		printf("%d ", a[i]);
-	printf("\n");
-	merge(a, 8); // вызов функции сортировки
-				 // Вывод элементов массива после сортировки
-	for (int i = 0; i<8; i++)
-		printf("%d ", a[i]);
-	printf("\n");
-	getchar();
+	} while (FindNextFile(hFind, &fdFile) && i < n);
+	FindClose(hFind);
 	return 0;
-}*/
+}
 
 
-
-
-
-
-
+void main()
+{
+	int i, n, p, m = 1, k;
+	float y;
+	wchar_t* xa;
+	files* b;
+	clock_t start, stop;
+	setlocale(LC_ALL, "Rus");
+	printf("РІРІРµРґРёС‚Рµ РїСѓС‚СЊ РґРѕ РґРёСЂРµРєС‚РѕСЂРёРё\n");
+	fgets(xa, T, stdin);
+	n = sum_files(xa);
+	p = ListDirectoryContents(xa, b, n);
+	if (p == 1)
+	{
+		printf("РѕС€РёР±РєР°\n");
+		return;
+	}
+	printf("РІРІРµРґРёС‚Рµ С‡РёСЃР»Рѕ СЌР»РµРјРµРЅС‚РѕРІ СЃ РѕРґРёРЅР°РєРѕРІС‹Рј СЂР°Р·РјРµСЂРѕРј");
+	scanf("%d", &k);
+	while (1)
+	{
+		printf("РІС‹Р±РµСЂРёС‚Рµ СЃРѕСЂС‚РёСЂРѕРІРєСѓ\n");
+		printf("1 - РІС‹Р±РѕСЂРѕРј\n 2 - РІСЃС‚Р°РІРєР°РјРё\n3 - РїСѓР·С‹СЂСЊРєРѕРІР°СЏ\n4 - РїРѕРґСЃС‡РµС‚РѕРј\n5 - СЃР»РёСЏРЅРёРµРј\n6 - РҐРѕР°СЂР°\n");
+		scanf("%d", &p);
+		switch (p)
+		{
+		case 1:
+			start = clock();
+			choose(n, b);
+			stop = clock();
+			y = (stop - start) / CLK_TCK;
+			print(b, y, n);
+			break;
+		case 2:
+			start = clock();
+			insert(n, b);
+			stop = clock();
+			y = (stop - start) / CLK_TCK;
+			print(b, y, n);
+			break;
+		case 3:
+			start = clock();
+			bubble(n, b);
+			stop = clock();
+			y = (stop - start) / CLK_TCK;
+			print(b, y, n);
+			break;
+		case 4:
+			start = clock();
+			count(n, b, k);
+			stop = clock();
+			y = (stop - start) / CLK_TCK;
+			print(b, y, n);
+			break;
+		case 5:
+			start = clock();
+			mergesort(b, 0, n - 1);
+			stop = clock();
+			y = (stop - start) / CLK_TCK;
+			print(b, y, n);
+			break;
+		case 6:
+			start = clock();
+			quick_sort(b, 0, n - 1);
+			stop = clock();
+			y = (stop - start) / CLK_TCK;
+			print(b, y, n);
+			break;
+		default:
+			printf("Р—Р°РґР°РЅР° РЅРµРІРµСЂРЅР°СЏ РґРёСЂРµРєС‚РѕСЂРёСЏ\n");
+			break;
+		}
+		printf("РІС‹Р±РµСЂРёС‚Рµ 0, РµСЃР»Рё С…РѕС‚РёС‚Рµ РІС‹Р№С‚Рё Рё 1, РµСЃР»Рё С…РѕС‚РёС‚Рµ РїСЂРѕРґРѕР»Р¶РёС‚СЊ\n");
+		scanf("%d", &m);
+		ListDirectoryContents(xa, b, n);
+		if (m == 0) return;
+	}
+}
