@@ -4,25 +4,23 @@
 #include <time.h>
 
 void main()
-
 {
-	int n, i, b = 0, w = 1, c = 9, q, m, p = 0, d = 0;
+	int n, i = 0, b = 0, w = 1, c = 9, q, m, p = 0, d = 0;
 	int a[10], t[10];
 	setlocale(LC_ALL, "Rus");
 	srand((unsigned int)time(0));
 	do
 	{
-		printf("¬ведите количество знаков n в числе \n");
+		printf("введите количество знаков n в числе \n");
 		scanf("%d", &n);
 	} while (n < 1 || n>10);
-	for (i = 0; i < n; i++)
+	do
 	{
 		a[i] = rand() * (c - b) / RAND_MAX + b;
-		while (a[0] == 0)
-		{
-			if (a[0] = 0)
-				a[0] = rand() * (c - w) / RAND_MAX + w;
-		}
+	} while (a[i] == 0);
+	for (i = 1; i < n; i++)
+	{
+		a[i] = rand() * (c - b) / RAND_MAX + b;
 		for (q = 0; q < i; q++)
 		{
 			if (a[i] == a[q])
@@ -37,7 +35,7 @@ void main()
 	{
 		p = 0;
 		d = 0;
-		printf("¬ведите n-значное число с неповтор¤ющимис¤ цифрами \n");
+		printf("введите n-значное число с неповторяющимися цифрами \n");
 		for (m = 0; m < n; m++)
 		{
 			scanf("%d", &(t[m]));
