@@ -5,7 +5,7 @@
 
 void main()
 {
-	int n, i = 0, b = 0, w = 1, c = 9, q, m, p = 0, d = 0;
+	int n, i = 0, b = 0,  c = 9, q, m, p = 0, d = 0;
 	int a[10], t[10];
 	setlocale(LC_ALL, "Rus");
 	srand((unsigned int)time(0));
@@ -36,9 +36,11 @@ void main()
 		p = 0;
 		d = 0;
 		printf("введите n-значное число с неповторяющимися цифрами \n");
-		for (m = 0; m < n; m++)
+		scanf("%d", &m);
+		for (i = n - 1; i > -1; i--)
 		{
-			scanf("%d", &(t[m]));
+			t[i] = m % 10;
+			m = m / 10;
 		}
 		for (i = 0; i < n; i++)
 		{
