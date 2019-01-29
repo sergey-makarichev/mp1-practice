@@ -34,7 +34,7 @@ void main()
 				break;
 			}
 		}
-		printf("колличество попыток %d \n", i);
+		printf("количество попыток %d \n", i);
 	}
 	if (n == 2)
 	{
@@ -47,7 +47,7 @@ void main()
 		printf("число, выбранное компьютером %d \n", k);
 		while (1)
 		{
-			scanf("%c", &q);
+			scanf("%*c%c", &q);
 			if (q == '<')
 			{
 				b = k;
