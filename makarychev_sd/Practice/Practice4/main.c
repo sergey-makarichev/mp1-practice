@@ -3,7 +3,7 @@
 
 int vvod_sravn(int e, int t)
 {
-	int i, l, k1 = 0, k2 = 0, k3 = 0, k4 = 0, k5 = 0;
+	int i, l, k1 = 0, k2 = 0, k3 = 0, k4 = 0, k5 = 0, m;
 	int q1[4] = { 0, 0, 1, 0 };
 	int q2[4] = { 0, 2, 3, 4 };
 	int q3[4] = { 9, 3, 4, 3 };
@@ -16,9 +16,11 @@ int vvod_sravn(int e, int t)
 	if (l == 0)
 		return t = 0;
 	printf("\n\n введите штрих-код \n");
-	for (i = 0; i < 4; i++)
+	scanf("%d", &m);
+	for (i = 3; i > -1; i--)
 	{
-		scanf("%d", &(a[i]));
+		a[i] = m % 10;
+		m = m / 10;
 	}
 	for (i = 0; i < 4; i++)
 	{
@@ -84,7 +86,7 @@ int vivod_information(int e)
 }
 void chek(int k1, int k2, int k3, int k4, int k5)
 {
-	int x = 0;
+	float x = 0, y = 0, z = 0;
 	printf("\n\n\t чек на покупку \n");
 	if (k1 != 0)
 	{
@@ -112,7 +114,11 @@ void chek(int k1, int k2, int k3, int k4, int k5)
 		printf("количество %d \n", k5);
 	}
 	x = 136 * k1 + 15 * k2 + 50 * k3 + 120 * k4 + 100 * k5;
-	printf("итоговая сумма: %d \n", x);
+	y = 136 * 0.9 * k1 + 15 * k2 + 50 * 0.93 * k3 + 120 * k4 + 100 * 0.89 * k5;
+	z = x - y;
+	printf("общая стоимость товаров: %10.2f \n", x);
+	printf("суммарная скидка: %10.2f \n", z);
+	printf("итоговая сумма: %10.2f \n", y);
 }
 void main()
 {
